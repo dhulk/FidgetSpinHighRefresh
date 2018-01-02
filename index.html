@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  background: #222;
+  margin: auto;
+  width: 960px;  
+}
+
+svg {
+	margin-top: 5px;
+}
+
+/*.arc-text {
+  font: 16px sans-serif;
+}
+
+.arc-center {
+  fill: none;
+}
+
+#credit {
+  position: absolute;
+  font: 10px sans-serif;
+  right: 10px;
+  bottom: 10px;
+  color: #ddd;
+}
+
+#credit a {
+  color: inherit;
+}*/
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<body></body>
+<script>
+
+var width = 400;
+var height = 400;
+var arenaWidth = width - 3;
+var areaHeight = height - 3;
+var midPoint = {
+	x: width / 2,
+	y: height / 2
+}
+var mainRadius = 100;
+var rotateEighth = 45;//degree
+var piFactor = Math.PI / 180;
+
+function findPointByRotation( point, radius, angle, color ) {	
+	return {	
+		x: point.x + ( radius * Math.cos( angle * piFactor ) ),
+		y: point.y + ( radius * Math.sin( angle * piFactor ) ),
+		radius: radius,
+		angle: angle,
+		color: color || '#444444'
+	}	
+}
+
+var circleCenters = [
+	findPointByRotation( midPoint, mainRadius, 0),	
+	//lights
+	findPointByRotation( midPoint, mainRadius + 20, 0),
+	findPointByRotation( midPoint, mainRadius + 10, 0),
+	findPointByRotation( midPoint, mainRadius, 0),
+	findPointByRotation( midPoint, mainRadius - 10, 0),
+	findPointByRotation( midPoint, mainRadius - 20, 0),
+	
+	findPointByRotation( midPoint, mainRadius, rotateEighth * 3 ),
+	findPointByRotation( midPoint, mainRadius, rotateEighth * 5 )
+];
+
+var series;
+var svg = d3.select('body').append('svg')
+	.attr('width', width)
+	.attr('height', height);
+	
+//Draw first circle
+svg.append('circle')	
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[0].x)
+	.attr('cy', circleCenters[0].y)
+	.attr('r', 40);
+//Draw lights
+svg.append('circle')	
+	.attr('class', 'light-up')
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[1].x)
+	.attr('cy', circleCenters[1].y)
+	.attr('r', 4);
+svg.append('circle')	
+	.attr('class', 'light-up')
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[2].x)
+	.attr('cy', circleCenters[2].y)
+	.attr('r', 4);
+svg.append('circle')	
+	.attr('class', 'light-up')
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[3].x)
+	.attr('cy', circleCenters[3].y)
+	.attr('r', 4);
+svg.append('circle')	
+	.attr('class', 'light-up')
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[4].x)
+	.attr('cy', circleCenters[4].y)
+	.attr('r', 4);
+svg.append('circle')	
+	.attr('class', 'light-up')
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[5].x)
+	.attr('cy', circleCenters[5].y)
+	.attr('r', 4);
+
+//Draw opposing ends	
+svg.append('circle')	
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[6].x)
+	.attr('cy', circleCenters[6].y)
+	.attr('r', 40);
+svg.append('circle')	
+	.attr('fill', '#444444')
+	.attr('cx', circleCenters[7].x)
+	.attr('cy', circleCenters[7].y)
+	.attr('r', 40);
+
+//Spin the circles
+setInterval( () => {
+
+	var r = Math.random();
+	_.each( circleCenters, ( currCenter ) => {
+	
+		currCenter.angle += 23; //* r;
+		currCenter = currCenter.angle % 360;
+	});
+	
+	svg.selectAll('circle')
+		.data( circleCenters )
+		//.transition()
+		//.duration(16.66666666666667)
+		.attr('cx', ( d ) => findPointByRotation( midPoint, d.radius, d.angle).x )
+		.attr('cy', ( d ) => findPointByRotation( midPoint, d.radius, d.angle).y );
+	
+}, 16.66666666666667);
+
+//Flash the lights
+setInterval( () => {
+	
+	svg.selectAll('circle')
+		.data( circleCenters )
+		.transition()
+		.duration( ( d, i ) => {
+		
+			if ( i % 2 === 0 ) {
+				return 50;
+			}
+			else {
+				return 75;
+			}
+		})
+		.attr('fill', ( d, i ) => {
+		
+			if ( d.color === '#444444') {				
+				switch ( i ) {
+					case 1:
+						d.color = 'red';//'#fff';
+						break;
+					case 2: 
+						d.color = 'red';//'#fff';
+						break;
+					case 3:
+						d.color = 'red';//'#fff';
+						break;
+					case 4:
+						d.color = 'red';//'#fff';
+						break;
+					default:
+						return '#444444';
+				}
+				return d.color;
+			}
+			else {
+				d.color = '#444444';
+				return d.color;
+			}
+			
+			
+		});		
+}, 16.66666666666667);
+
+</script>
